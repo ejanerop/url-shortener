@@ -23,21 +23,25 @@ app.get("/", function (req, res) {
 
 app.post("/api/shorturl", function (req, res) {
   const url = req.body.url;
-  const urlObject = new URL(url);
+  try {
+    const urlObject = new URL(url);
 
-  let urlsFile = fs.readFileSync("url.json");
-  let urls = JSON.parse(urlsFile);
+    let urlsFile = fs.readFileSync("url.json");
+    let urls = JSON.parse(urlsFile);
 
-  dns.lookup(urlObject.hostname, (err, address) => {
-    if (err) {
-      res.json({error: "invalid url"});
-    } else {
-      let shortenedURL = Math.floor(Math.random() * 100000).toString();
-      urls[shortenedURL] = url;
-      fs.writeFileSync("url.json", JSON.stringify(urls));
-      res.json({original_url: url, short_url: shortenedURL});
-    }
-  });
+    dns.lookup(urlObject.hostname, (err, address) => {
+      if (err) {
+        res.json({error: "invalid url"});
+      } else {
+        let shortenedURL = Math.floor(Math.random() * 100000).toString();
+        urls[shortenedURL] = url;
+        fs.writeFileSync("url.json", JSON.stringify(urls));
+        res.json({original_url: url, short_url: shortenedURL});
+      }
+    });
+  } catch (error) {
+    res.json({error: "invalid url"});
+  }
 });
 
 app.get("/api/shorturl/:short_url", function (req, res) {
