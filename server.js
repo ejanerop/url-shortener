@@ -23,6 +23,11 @@ app.get("/", function (req, res) {
 
 app.post("/api/shorturl", function (req, res) {
   const url = req.body.url;
+
+  if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+    res.json({error: "invalid url"});
+  }
+
   try {
     const urlObject = new URL(url);
 
